@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,18 +13,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Game{
-	
+
 	static Players currentPlayer = Players.X;
 	static boolean gameOver = false;
 	static TicTacToe gameBoard = new TicTacToe();
 	static JLabel sideMessage = new JLabel("X's Turn!");
 	static JFrame window = new JFrame();
-	
+	static JButton[][] boardButtons = {{new JButton(), new JButton(), new JButton()}, {new JButton(), new JButton(), new JButton()},{new JButton(), new JButton(), new JButton()}};
+
 	public static void main(String[] args)
 	{
 		setUpWindow();
 	}
-	
+
 	public static void initialize()
 	{
 		currentPlayer = Players.X;
@@ -32,8 +34,8 @@ public class Game{
 		sideMessage = new JLabel("X's Turn");
 		window = new JFrame();
 	}
-	
-	
+
+
 	//sets up the JFrame window for the Tic-Tac-Toe game
 	public static void setUpWindow()
 	{
@@ -44,10 +46,9 @@ public class Game{
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setTitle("Tic-Tac-Toe");
 		window.setVisible(true);
-		
+
 		//set up for the board JPanel
-		board.setSize(480,480);
-		JButton[][] boardButtons = {{new JButton(), new JButton(), new JButton()}, {new JButton(), new JButton(), new JButton()},{new JButton(), new JButton(), new JButton()}};
+		board.setPreferredSize(new Dimension(480,480));
 		board.setLayout(new GridLayout(3,3));
 		for(int i = 0; i < 3; i++) //set up all buttons on the game board in a 3x3 grid
 		{
@@ -58,23 +59,37 @@ public class Game{
 				boardButtons[i][j].setName(String.valueOf(i) + j); //Button's name is used to identify its corresponding grid coordinates
 			}
 		}
-		
+
 		//Set up for the sideDisplay JPanel
-		sideDisplay.setSize(160,480);
+		sideDisplay.setPreferredSize(new Dimension(160,480));
 		sideDisplay.add(sideMessage);
 		JButton reset = new JButton("reset");
 		reset.addActionListener(new ResetButton());
 		sideDisplay.add(reset);
-		
-		
+
+
 		window.add(board);
 		window.add(sideDisplay, BorderLayout.EAST);
 	}
 
+
+//resets the game to the starting turn. 
+	static void reset()
+	{
+		for(int i = 0; i < 3; i++) //set up all buttons on the game board in a 3x3 grid
+		{
+			for(int j = 0; j < 3; j++)
+			{
+				boardButtons[i][j].setText("");
+
+			}
+		}
+		gameBoard = new TicTacToe();
+		currentPlayer = Players.X;
+		sideMessage.setText("X's Turn");
+		gameOver = false;
+	}
 }
-
-
-
 
 //ActionListener for the Tic-Tac-Toe game buttons
 //when pressed a button updates the gameboard, and what it displays appropriately
@@ -88,7 +103,7 @@ class BoardButton implements ActionListener{
 		JButton buttonClicked = (JButton)e.getSource();
 		int row = Character.getNumericValue(buttonClicked.getName().charAt(0)); //which row the button corresponds to
 		int column = Character.getNumericValue(buttonClicked.getName().charAt(1)); //which column the button corresponds to
-		
+
 		if(board.makeMove(player, row, column) && !Game.gameOver) //continue if the move is legal and the game is not already finished
 		{
 			if(player == Players.X) 
@@ -130,23 +145,22 @@ class BoardButton implements ActionListener{
 				}
 			}
 		}
-		
+
 	}
 }
-	
+
 //ActionListener for the reset button
 //destroys the current window, reinitializes static variables, and creates a new window
 class ResetButton implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Game.window.dispose();
-			Game.initialize();
-			Game.setUpWindow();
-		}
-		
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Game.reset();
+	}
+
 }
-	
-	
+
+
+
 
 
